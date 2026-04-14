@@ -1,0 +1,10 @@
+# jangan deteksi package dari graphql-gen 
+/graphql-gen
+/vendor 
+.env
+.vscode
+.DS_Store
+
+# Database files
+#.db
+#.sqlite
