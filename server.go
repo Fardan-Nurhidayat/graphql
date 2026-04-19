@@ -2,6 +2,7 @@ package main
 
 import (
 	"graphql/graph"
+	"graphql/middleware"
 	"graphql/models"
 	"log"
 	"net/http"
@@ -37,9 +38,14 @@ func main() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New[string](100),
 	})
+	srv.Use(extension.FixedComplexityLimit(60))
+
+	var hdr http.Handler = srv
+	hdr = middleware.Logging(hdr)
+	hdr = middleware.RequestID(hdr)
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	http.Handle("/query", hdr)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
